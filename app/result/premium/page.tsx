@@ -7,11 +7,16 @@ import { getReading, updatePremiumResult } from '@/lib/firestore';
 import { generatePremiumResult } from '@/lib/ai';
 import ProbabilityBar from '@/components/ProbabilityBar';
 
-function Section({ label, children }: { label: string; children: React.ReactNode }) {
+function AnalysisCard({ label, icon, children }: { label: string; icon: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl p-5 glass" style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
-      <p className="text-[10px] font-bold tracking-widest uppercase text-lavender/60 mb-3">{label}</p>
-      {children}
+    <div className="rounded-2xl overflow-hidden"
+      style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
+      <div className="flex items-center gap-2.5 px-5 py-3.5"
+        style={{ background: 'rgba(255,255,255,0.03)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <span className="text-sm" style={{ color: '#b19cd9' }}>{icon}</span>
+        <p className="text-[11px] font-bold tracking-[0.1em] uppercase" style={{ color: '#7c6bad' }}>{label}</p>
+      </div>
+      <div className="px-5 py-4">{children}</div>
     </div>
   );
 }
@@ -54,7 +59,6 @@ function PremiumInner() {
 
         setReading(r);
 
-        // 이미 premium result가 있으면 재사용
         if (r.premiumResult) {
           setReport(r.premiumResult);
           setLoading(false);
@@ -81,163 +85,199 @@ function PremiumInner() {
 
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div
-            className="inline-block w-10 h-10 rounded-full border-2 animate-spin mb-4"
-            style={{ borderColor: 'rgba(201,149,108,0.5)', borderTopColor: 'transparent' }}
-          />
-          <p className="text-sm text-ivory/70">정밀 리포트를 생성하고 있어요...</p>
-          <p className="text-xs text-ivory-dim/40 mt-1">잠시만 기다려주세요</p>
+      <div className="page-bg min-h-screen flex items-center justify-center">
+        <div className="text-center px-4">
+          <div className="inline-block w-12 h-12 rounded-full border-2 animate-spin mb-5"
+            style={{ borderColor: 'rgba(201,149,108,0.4)', borderTopColor: '#e0b48c' }} />
+          <p className="text-base font-bold text-ivory mb-1">정밀 리포트를 생성하고 있어요</p>
+          <p className="text-sm" style={{ color: '#9d96b0' }}>AI가 카드와 관계 패턴을 분석 중입니다...</p>
         </div>
-      </main>
+      </div>
     );
   }
 
   if (error || !reading || !report) {
     return (
-      <main className="min-h-screen flex items-center justify-center px-4">
+      <div className="page-bg min-h-screen flex items-center justify-center px-4">
         <div className="text-center">
-          <p className="text-ivory/70 mb-4">{error || '리포트를 불러올 수 없어요.'}</p>
-          <button onClick={() => router.push('/')} className="text-lavender text-sm underline">홈으로</button>
+          <p className="mb-4 text-sm" style={{ color: '#9d96b0' }}>{error || '리포트를 불러올 수 없어요.'}</p>
+          <button onClick={() => router.push('/')} className="text-sm underline" style={{ color: '#b19cd9' }}>
+            홈으로
+          </button>
         </div>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className="min-h-screen px-4 py-12 max-w-lg mx-auto">
-      {/* Header */}
-      <div className="text-center mb-10">
-        <div
-          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-4"
-          style={{ background: 'rgba(201,149,108,0.15)', color: '#e0b48c' }}
-        >
-          ✦ 정밀 리포트
-        </div>
-        <h1 className="text-2xl font-extrabold text-ivory mb-1" style={{ letterSpacing: '-0.02em' }}>
-          {reading.partnerName}님에 대한<br />AI 정밀 분석
-        </h1>
-        <p className="text-sm text-ivory-dim/70">{reading.userName}님만을 위한 리포트예요.</p>
-      </div>
+    <div className="page-bg min-h-screen">
+      <main className="px-4 py-10 max-w-lg mx-auto">
 
-      <div className="space-y-4">
-        {/* Overall summary */}
-        <div
-          className="rounded-2xl p-5"
-          style={{
-            background: 'linear-gradient(145deg, rgba(177,156,217,0.12), rgba(13,8,32,0.7))',
-            border: '1px solid rgba(177,156,217,0.25)',
-          }}
-        >
-          <p className="text-[10px] font-bold tracking-widest uppercase text-lavender/60 mb-3">전체 요약</p>
-          <p className="text-sm text-ivory/90 leading-relaxed">{report.overallSummary}</p>
-        </div>
-
-        {/* Partner psychology */}
-        <Section label="상대의 현재 심리">
-          <p className="text-sm text-ivory/90 leading-relaxed">{report.partnerPsychology}</p>
-        </Section>
-
-        {/* Hidden emotions */}
-        <Section label="숨기고 있는 감정">
-          <p className="text-sm text-ivory/90 leading-relaxed">{report.hiddenEmotions}</p>
-        </Section>
-
-        {/* Probabilities */}
-        <div
-          className="rounded-2xl p-5 glass"
-          style={{ border: '1px solid rgba(255,255,255,0.08)' }}
-        >
-          <p className="text-[10px] font-bold tracking-widest uppercase text-lavender/60 mb-4">확률 분석</p>
-          <div className="space-y-4">
-            <ProbabilityBar label="연락 가능성" value={report.contactProbability} color="lavender" delay={0} />
-            {report.reunionProbability > 0 && (
-              <ProbabilityBar label="재회 가능성" value={report.reunionProbability} color="rose" delay={200} />
-            )}
+        {/* Premium header badge */}
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-4"
+            style={{ background: 'rgba(201,149,108,0.15)', border: '1px solid rgba(201,149,108,0.35)', color: '#e0b48c' }}>
+            ✦ 정밀 AI 분석 리포트
           </div>
+          <h1 className="text-2xl font-extrabold text-ivory mb-2" style={{ letterSpacing: '-0.025em' }}>
+            {reading.partnerName}님에 대한<br />AI 정밀 분석
+          </h1>
+          <p className="text-sm" style={{ color: '#9d96b0' }}>
+            {reading.userName}님만을 위해 생성된 리포트예요.
+          </p>
         </div>
 
-        {/* Next 2 weeks */}
-        <Section label="앞으로 2주 흐름">
-          <p className="text-sm text-ivory/90 leading-relaxed">{report.nextTwoWeeks}</p>
-        </Section>
+        <div className="space-y-4">
 
-        {/* Things to avoid */}
-        <Section label="피해야 할 행동">
-          <ul className="space-y-2">
-            {report.thingsToAvoid.map((item, i) => (
-              <li key={i} className="flex items-start gap-2.5 text-xs text-ivory/80 leading-relaxed">
-                <span className="shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-[10px] mt-0.5"
-                  style={{ background: 'rgba(201,149,108,0.15)', color: '#e0b48c' }}>
-                  {i + 1}
-                </span>
-                {item}
-              </li>
-            ))}
-          </ul>
-        </Section>
+          {/* 1. Overall summary */}
+          <div className="rounded-2xl p-5"
+            style={{
+              background: 'linear-gradient(145deg, rgba(177,156,217,0.12), rgba(8,4,18,0.8))',
+              border: '1px solid rgba(177,156,217,0.3)',
+              boxShadow: '0 0 32px rgba(139,107,181,0.15)',
+            }}>
+            <div className="flex items-center gap-2 mb-3">
+              <span style={{ color: '#b19cd9', fontSize: '16px' }}>◎</span>
+              <p className="text-[11px] font-bold tracking-[0.1em] uppercase" style={{ color: '#7c6bad' }}>
+                전체 요약
+              </p>
+            </div>
+            <p className="text-sm leading-relaxed text-ivory">{report.overallSummary}</p>
+          </div>
 
-        {/* Recommended actions */}
-        <Section label="추천 행동 3가지">
-          <ul className="space-y-2">
-            {report.recommendedActions.map((item, i) => (
-              <li key={i} className="flex items-start gap-2.5 text-xs text-ivory/80 leading-relaxed">
-                <span className="shrink-0 w-4 h-4 rounded-full flex items-center justify-center text-[10px] mt-0.5"
-                  style={{ background: 'rgba(177,156,217,0.15)', color: '#d4c5f0' }}>
-                  {i + 1}
-                </span>
-                {item}
-              </li>
-            ))}
-          </ul>
-        </Section>
+          {/* 2. Partner psychology */}
+          <AnalysisCard label="상대의 현재 심리" icon="◯">
+            <p className="text-sm leading-relaxed" style={{ color: '#d4c5f0' }}>{report.partnerPsychology}</p>
+          </AnalysisCard>
 
-        {/* Final advice */}
-        <div
-          className="rounded-2xl p-5 text-center"
-          style={{
-            background: 'linear-gradient(145deg, rgba(201,149,108,0.1), rgba(13,8,32,0.6))',
-            border: '1px solid rgba(201,149,108,0.2)',
-          }}
-        >
-          <p className="text-[10px] font-bold tracking-widest uppercase text-rose-gold/60 mb-3">마지막 조언</p>
-          <p className="text-sm text-ivory/90 leading-relaxed">{report.finalAdvice}</p>
+          {/* 3. Hidden emotions */}
+          <AnalysisCard label="숨기고 있는 감정" icon="☽">
+            <p className="text-sm leading-relaxed" style={{ color: '#d4c5f0' }}>{report.hiddenEmotions}</p>
+          </AnalysisCard>
+
+          {/* 4. Probability analysis */}
+          <div className="rounded-2xl overflow-hidden"
+            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(201,149,108,0.2)' }}>
+            <div className="flex items-center gap-2.5 px-5 py-3.5"
+              style={{ background: 'rgba(201,149,108,0.06)', borderBottom: '1px solid rgba(201,149,108,0.15)' }}>
+              <span style={{ color: '#e0b48c', fontSize: '14px' }}>✦</span>
+              <p className="text-[11px] font-bold tracking-[0.1em] uppercase" style={{ color: '#c9956c' }}>
+                확률 수치 분석
+              </p>
+            </div>
+            <div className="px-5 py-5 space-y-5">
+              <ProbabilityBar label="연락 가능성" value={report.contactProbability} color="lavender" delay={0} />
+              {report.reunionProbability > 0 && (
+                <ProbabilityBar label="재회 가능성" value={report.reunionProbability} color="rose" delay={200} />
+              )}
+              <div className="pt-2 border-t" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
+                <p className="text-[11px] leading-relaxed" style={{ color: '#5e5870' }}>
+                  * 수치는 카드 조합과 현재 관계 맥락을 바탕으로 AI가 산출한 심리 예측값입니다.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* 5. Next 2 weeks */}
+          <AnalysisCard label="앞으로 2주 감정 흐름 예측" icon="◇">
+            <p className="text-sm leading-relaxed" style={{ color: '#d4c5f0' }}>{report.nextTwoWeeks}</p>
+          </AnalysisCard>
+
+          {/* 6. Things to avoid */}
+          <AnalysisCard label="절대 피해야 할 행동 4가지" icon="⊕">
+            <ul className="space-y-3">
+              {report.thingsToAvoid.map((item, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <div className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5"
+                    style={{ background: 'rgba(201,149,108,0.15)', color: '#e0b48c', border: '1px solid rgba(201,149,108,0.2)' }}>
+                    {i + 1}
+                  </div>
+                  <p className="text-xs leading-relaxed" style={{ color: '#d4c5f0' }}>{item}</p>
+                </li>
+              ))}
+            </ul>
+          </AnalysisCard>
+
+          {/* 7. Recommended actions */}
+          <AnalysisCard label="지금 추천 행동 3가지" icon="✦">
+            <ul className="space-y-3">
+              {report.recommendedActions.map((item, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <div className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold mt-0.5"
+                    style={{ background: 'rgba(139,107,181,0.2)', color: '#d4c5f0', border: '1px solid rgba(177,156,217,0.25)' }}>
+                    {i + 1}
+                  </div>
+                  <p className="text-xs leading-relaxed" style={{ color: '#d4c5f0' }}>{item}</p>
+                </li>
+              ))}
+            </ul>
+          </AnalysisCard>
+
+          {/* 8. Optimal timing */}
+          {'optimalContactTiming' in report && (report as { optimalContactTiming?: string }).optimalContactTiming && (
+            <div className="rounded-2xl p-5"
+              style={{ background: 'rgba(212,175,55,0.06)', border: '1px solid rgba(212,175,55,0.2)' }}>
+              <p className="text-[11px] font-bold tracking-[0.1em] uppercase mb-2" style={{ color: '#d4af37' }}>
+                ✦ 먼저 연락하기 최적 타이밍
+              </p>
+              <p className="text-sm leading-relaxed text-ivory">
+                {(report as { optimalContactTiming?: string }).optimalContactTiming}
+              </p>
+            </div>
+          )}
+
+          {/* 9. Final advice */}
+          <div className="rounded-2xl p-6 text-center"
+            style={{
+              background: 'linear-gradient(145deg, rgba(201,149,108,0.1), rgba(8,4,18,0.8))',
+              border: '1px solid rgba(201,149,108,0.3)',
+              boxShadow: '0 0 32px rgba(201,149,108,0.1)',
+            }}>
+            <div className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-4"
+              style={{ background: 'rgba(201,149,108,0.15)', border: '1px solid rgba(201,149,108,0.25)' }}>
+              <span style={{ color: '#e0b48c', fontSize: '16px' }}>✦</span>
+            </div>
+            <p className="text-[11px] font-bold tracking-[0.1em] uppercase mb-3" style={{ color: '#c9956c' }}>
+              나만을 위한 마지막 조언
+            </p>
+            <p className="text-sm leading-relaxed text-ivory">{report.finalAdvice}</p>
+          </div>
+
+          {/* PDF download (UI) */}
+          <button type="button" disabled
+            className="w-full py-3.5 rounded-2xl text-sm font-semibold flex items-center justify-center gap-2"
+            style={{
+              background: 'rgba(255,255,255,0.04)',
+              border: '1px solid rgba(255,255,255,0.08)',
+              color: 'rgba(240,235,224,0.3)',
+              cursor: 'not-allowed',
+            }}>
+            <span>↓</span> PDF 저장 (준비 중)
+          </button>
+
+          {/* Divider */}
+          <div className="py-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
+
+          {/* New reading */}
+          <button type="button" onClick={() => router.push('/')}
+            className="w-full py-4 rounded-2xl font-bold text-sm transition-all active:scale-[0.98]"
+            style={{
+              background: 'linear-gradient(135deg, #6b3fa0 0%, #9b6dd0 100%)',
+              color: '#fff',
+              boxShadow: '0 4px 28px rgba(107,63,160,0.35)',
+            }}>
+            새로운 리딩 시작하기 →
+          </button>
+
+          <p className="text-center text-[11px]" style={{ color: '#3e3850' }}>
+            © 2026 Aura · 리딩 결과는 심리 분석 기반의 참고 목적입니다.
+          </p>
         </div>
-
-        {/* PDF download (UI only) */}
-        <button
-          type="button"
-          disabled
-          className="w-full py-3.5 rounded-2xl text-sm font-semibold transition-all"
-          style={{
-            background: 'rgba(255,255,255,0.04)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            color: 'rgba(240,235,224,0.3)',
-            cursor: 'not-allowed',
-          }}
-        >
-          PDF 저장 (준비 중)
-        </button>
-
-        {/* Retry button */}
-        <button
-          type="button"
-          onClick={() => router.push('/')}
-          className="w-full py-3.5 rounded-2xl text-sm font-semibold transition-all active:scale-95"
-          style={{ background: 'rgba(177,156,217,0.1)', border: '1px solid rgba(177,156,217,0.2)', color: '#d4c5f0' }}
-        >
-          새로운 리딩 시작하기
-        </button>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }
 
 export default function PremiumResultPage() {
-  return (
-    <Suspense>
-      <PremiumInner />
-    </Suspense>
-  );
+  return <Suspense><PremiumInner /></Suspense>;
 }

@@ -2,89 +2,134 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  color-scheme: dark;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
+:root { color-scheme: dark; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 
 body {
   margin: 0;
-  background: #0d0820;
+  background: #080412;
   color: #f0ebe0;
-  font-family: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
-    "Noto Sans KR", "Segoe UI", sans-serif;
+  font-family: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont, "Noto Sans KR", sans-serif;
   -webkit-font-smoothing: antialiased;
   letter-spacing: -0.01em;
   min-height: 100vh;
 }
 
-/* Glass card base */
+/* ── Background gradient ── */
+.page-bg {
+  background:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(120, 60, 220, 0.25) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(80, 20, 160, 0.15) 0%, transparent 50%),
+    linear-gradient(180deg, #080412 0%, #0e0620 50%, #080412 100%);
+}
+
+/* ── Glass ── */
 .glass {
   background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
-/* Tarot card flip */
-.perspective {
-  perspective: 1000px;
+.glass-strong {
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* ── Card flip ── */
+.perspective { perspective: 1200px; }
 .card-inner {
   position: relative;
   width: 100%;
   height: 100%;
   transform-style: preserve-3d;
-  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.75s cubic-bezier(0.4, 0, 0.2, 1);
 }
-
-.card-inner.flipped {
-  transform: rotateY(180deg);
-}
-
+.card-inner.flipped { transform: rotateY(180deg); }
 .card-face {
   position: absolute;
   inset: 0;
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
+.card-back-face { transform: rotateY(180deg); }
 
-.card-back-face {
-  transform: rotateY(180deg);
+/* ── Float animations ── */
+@keyframes float-left {
+  0%, 100% { transform: rotate(-8deg) translateY(0px); }
+  50% { transform: rotate(-8deg) translateY(-10px); }
+}
+@keyframes float-center {
+  0%, 100% { transform: rotate(0deg) translateY(-4px); }
+  50% { transform: rotate(0deg) translateY(-14px); }
+}
+@keyframes float-right {
+  0%, 100% { transform: rotate(8deg) translateY(-2px); }
+  50% { transform: rotate(8deg) translateY(-12px); }
+}
+.float-left { animation: float-left 4s ease-in-out infinite; }
+.float-center { animation: float-center 4s ease-in-out infinite; animation-delay: 0.8s; }
+.float-right { animation: float-right 4s ease-in-out infinite; animation-delay: 1.6s; }
+
+/* ── Fade up ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-up { animation: fadeUp 0.6s ease-out forwards; }
+.fade-up-2 { animation: fadeUp 0.6s ease-out 0.15s both; }
+.fade-up-3 { animation: fadeUp 0.6s ease-out 0.3s both; }
+.fade-up-4 { animation: fadeUp 0.6s ease-out 0.45s both; }
+
+/* ── Pulse dot ── */
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.85); }
+}
+.pulse-dot { animation: pulseDot 1.5s ease-in-out infinite; }
+
+/* ── Shimmer (for blur overlay) ── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
-/* Blur gradient for locked content */
-.blur-overlay {
-  position: relative;
-}
-
-.blur-overlay::after {
+/* ── Blur overlay for premium lock ── */
+.blur-section { position: relative; overflow: hidden; }
+.blur-section::after {
   content: '';
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 60%;
-  background: linear-gradient(to bottom, transparent, #0d0820 85%);
+  bottom: 0; left: 0; right: 0;
+  height: 65%;
+  background: linear-gradient(to bottom, transparent 0%, #080412 70%);
   pointer-events: none;
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
+/* ── Gold border ── */
+.gold-border {
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  position: relative;
 }
-::-webkit-scrollbar-track {
-  background: #0d0820;
+.gold-border::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.5), rgba(201, 149, 108, 0.3), rgba(177, 156, 217, 0.4));
+  z-index: -1;
 }
-::-webkit-scrollbar-thumb {
-  background: rgba(177, 156, 217, 0.3);
-  border-radius: 3px;
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: #080412; }
+::-webkit-scrollbar-thumb { background: rgba(139, 107, 181, 0.3); border-radius: 3px; }
+
+/* ── Input focus glow ── */
+.input-glow:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(139, 107, 181, 0.4), 0 0 20px rgba(139, 107, 181, 0.15);
 }
