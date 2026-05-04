@@ -1,0 +1,8 @@
+runConfig:
+  cpu: 1
+  memoryMiB: 512
+  minInstances: 0
+
+env:
+  - variable: NEXT_PUBLIC_USE_MOCK
+    value: "true"
