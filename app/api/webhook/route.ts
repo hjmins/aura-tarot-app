@@ -1,34 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
-import { markAsPaid } from '@/lib/firestore';
+// Static export 호환 stub. Stripe Webhook은 App Hosting(SSR) 환경에서만 동작.
+// 실제 Stripe 웹훅 연결 시: NEXT_PUBLIC_USE_MOCK=false + App Hosting 배포 후 아래 TODO 구현
 
-// TODO: Stripe 웹훅 서명 검증 추가
-// 대시보드 > Webhooks > Signing secret 을 STRIPE_WEBHOOK_SECRET 환경변수에 설정
+export const dynamic = 'force-static';
 
-export async function POST(req: NextRequest) {
-  const body = await req.text();
-  const sig = req.headers.get('stripe-signature') ?? '';
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-  let event;
-  try {
-    if (webhookSecret) {
-      event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
-    } else {
-      event = JSON.parse(body);
-    }
-  } catch (err) {
-    console.error('Webhook error:', err);
-    return NextResponse.json({ error: 'invalid signature' }, { status: 400 });
-  }
-
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object as { id: string; metadata?: { readingId?: string } };
-    const readingId = session.metadata?.readingId;
-    if (readingId) {
-      await markAsPaid(readingId, session.id);
-    }
-  }
-
-  return NextResponse.json({ received: true });
+export async function POST() {
+  // TODO: Stripe 웹훅 연결 시 아래 코드로 교체
+  // import { stripe } from '@/lib/stripe';
+  // import { markAsPaid } from '@/lib/firestore';
+  // const body = await req.text();
+  // const sig = req.headers.get('stripe-signature') ?? '';
+  // const event = stripe.webhooks.constructEvent(body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
+  // if (event.type === 'checkout.session.completed') { await markAsPaid(...) }
+  return Response.json({ received: false, note: 'Webhook not active in static/mock mode' }, { status: 501 });
 }

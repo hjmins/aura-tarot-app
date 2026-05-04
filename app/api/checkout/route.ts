@@ -1,41 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { stripe, PRICE_KRW } from '@/lib/stripe';
+// Static export 호환 stub. Mock 모드에서는 이 라우트가 호출되지 않음.
+// 실제 Stripe 결제 연결 시: NEXT_PUBLIC_USE_MOCK=false + App Hosting 배포 후 아래 TODO 구현
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const readingId = searchParams.get('id');
+export const dynamic = 'force-static';
 
-  if (!readingId) {
-    return NextResponse.json({ error: 'reading id required' }, { status: 400 });
-  }
-
-  const origin = req.headers.get('origin') ?? 'http://localhost:3000';
-
-  try {
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price_data: {
-            currency: 'krw',
-            product_data: {
-              name: 'AI 타로 정밀 리포트',
-              description: '상대 심리·연락 가능성·재회 확률·2주 흐름 분석',
-            },
-            unit_amount: PRICE_KRW,
-          },
-          quantity: 1,
-        },
-      ],
-      mode: 'payment',
-      success_url: `${origin}/result/premium?id=${readingId}&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/result/free?id=${readingId}`,
-      metadata: { readingId },
-    });
-
-    return NextResponse.json({ url: session.url });
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: 'stripe session creation failed' }, { status: 500 });
-  }
+export async function GET() {
+  // TODO: Stripe 연결 시 아래 코드로 교체
+  // import { stripe, PRICE_KRW } from '@/lib/stripe';
+  // const { searchParams } = new URL(req.url);
+  // const readingId = searchParams.get('id');
+  // const session = await stripe.checkout.sessions.create({ ... });
+  // return Response.json({ url: session.url });
+  return Response.json({ error: 'Stripe not configured. Set NEXT_PUBLIC_USE_MOCK=false and deploy to App Hosting.' }, { status: 501 });
 }
