@@ -133,3 +133,15 @@ body {
   outline: none;
   box-shadow: 0 0 0 2px rgba(139, 107, 181, 0.4), 0 0 20px rgba(139, 107, 181, 0.15);
 }
+
+/* ── Tarot hero card hover ── */
+.tarot-hero-card { transition: filter 0.35s ease; }
+.tarot-hero-card:hover { filter: brightness(1.14) drop-shadow(0 0 10px rgba(177, 156, 217, 0.4)); }
+
+/* ── Section divider ── */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(139,107,181,0.2), transparent);
+  margin: 0 auto;
+  max-width: 320px;
+}
