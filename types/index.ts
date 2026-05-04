@@ -1,5 +1,5 @@
 export type RelationshipStatus = '썸' | '연애중' | '헤어짐' | '읽씹/잠수' | '짝사랑';
-export type ServiceType = '상대 속마음 보기' | '연락 올 가능성 보기' | '재회 가능성 보기' | '직접 질문하기';
+export type ServiceType = 'love_mind' | 'contact_reunion' | 'money_business' | 'choice_tarot';
 
 export interface TarotCard {
   id: number;

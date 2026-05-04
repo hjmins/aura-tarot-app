@@ -4,11 +4,51 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ServiceType } from '@/types';
 
-const SERVICES: { type: ServiceType; icon: string; label: string; sub: string }[] = [
-  { type: '상대 속마음 보기', icon: '💜', label: '상대 속마음 분석', sub: '숨겨진 감정 & 진짜 마음' },
-  { type: '연락 올 가능성 보기', icon: '📩', label: '연락 올 가능성', sub: '연락 타이밍 & 확률' },
-  { type: '재회 가능성 보기', icon: '🔥', label: '재회 가능성', sub: '재결합 흐름 & 조건' },
-  { type: '직접 질문하기', icon: '❓', label: '직접 질문하기', sub: '내 상황 맞춤 분석' },
+const SERVICES: {
+  type: ServiceType;
+  icon: string;
+  label: string;
+  desc: string;
+  accent: string;
+  accentBg: string;
+  accentBorder: string;
+}[] = [
+  {
+    type: 'love_mind',
+    icon: '💜',
+    label: '상대 속마음',
+    desc: '그 사람이 숨기고 있는\n진짜 감정',
+    accent: '#d4c5f0',
+    accentBg: 'rgba(139,107,181,0.18)',
+    accentBorder: 'rgba(177,156,217,0.5)',
+  },
+  {
+    type: 'contact_reunion',
+    icon: '📩',
+    label: '연락·재회 가능성',
+    desc: '다시 연락이 올\n타이밍과 흐름',
+    accent: '#b19cd9',
+    accentBg: 'rgba(107,63,160,0.15)',
+    accentBorder: 'rgba(139,107,181,0.45)',
+  },
+  {
+    type: 'money_business',
+    icon: '💰',
+    label: '금전·사업운',
+    desc: '이번 달 돈과\n기회의 흐름',
+    accent: '#e0b48c',
+    accentBg: 'rgba(201,149,108,0.15)',
+    accentBorder: 'rgba(201,149,108,0.45)',
+  },
+  {
+    type: 'choice_tarot',
+    icon: '⚖️',
+    label: '선택 타로',
+    desc: 'A와 B 사이,\n지금 더 좋은 선택',
+    accent: '#9d96b0',
+    accentBg: 'rgba(157,150,176,0.12)',
+    accentBorder: 'rgba(157,150,176,0.4)',
+  },
 ];
 
 const REVIEWS = [
@@ -24,19 +64,15 @@ const WHY_ITEMS = [
   { icon: '◯', title: '관계 흐름 심리 매칭', desc: '현재 관계 상태와 심리적 맥락을 연결해 맞춤 해석을 도출합니다.' },
 ];
 
-// Floating hero card component
-function HeroCard({ className, delay }: { className: string; delay: string }) {
+function HeroCard({ delay }: { delay: string }) {
   return (
-    <div
-      className={`relative rounded-2xl flex flex-col items-center justify-center ${className}`}
+    <div className="relative rounded-2xl flex flex-col items-center justify-center"
       style={{
-        width: '90px',
-        height: '135px',
+        width: '90px', height: '135px',
         background: 'linear-gradient(155deg, rgba(139,107,181,0.15) 0%, rgba(8,4,18,0.9) 100%)',
         boxShadow: '0 8px 40px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.07)',
         animationDelay: delay,
-      }}
-    >
+      }}>
       <div style={{
         position: 'absolute', inset: -1, borderRadius: 'inherit',
         background: 'linear-gradient(135deg, rgba(212,175,55,0.4), rgba(139,107,181,0.3), rgba(212,175,55,0.2))',
@@ -57,7 +93,6 @@ export default function Home() {
   const [selected, setSelected] = useState<ServiceType | null>(null);
   const [count, setCount] = useState(134);
 
-  // Simulate live user counter
   useEffect(() => {
     const t = setInterval(() => {
       setCount((c) => {
@@ -77,7 +112,7 @@ export default function Home() {
     <div className="page-bg min-h-screen">
 
       {/* ── HERO ── */}
-      <section className="px-4 pt-12 pb-10 max-w-lg mx-auto text-center">
+      <section className="px-4 pt-12 pb-0 max-w-lg mx-auto text-center">
 
         {/* Social proof badge */}
         <div className="fade-up inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-6"
@@ -112,58 +147,83 @@ export default function Home() {
         {/* Floating hero cards */}
         <div className="flex items-end justify-center gap-3 mb-10" style={{ height: '160px' }}>
           <div className="float-left" style={{ marginBottom: '10px' }}>
-            <HeroCard className="" delay="0s" />
+            <HeroCard delay="0s" />
           </div>
           <div className="float-center" style={{ marginBottom: '0px' }}>
             <div style={{ transform: 'scale(1.1)' }}>
-              <HeroCard className="" delay="0.8s" />
+              <HeroCard delay="0.8s" />
             </div>
           </div>
           <div className="float-right" style={{ marginBottom: '10px' }}>
-            <HeroCard className="" delay="1.6s" />
+            <HeroCard delay="1.6s" />
           </div>
         </div>
+      </section>
 
-        {/* Service 2×2 grid */}
-        <p className="text-[11px] font-bold tracking-[0.18em] uppercase mb-3" style={{ color: '#5e5870' }}>
+      {/* ── SERVICE SELECTION ── */}
+      <section className="px-4 pb-10 max-w-lg mx-auto">
+
+        <p className="text-center text-[11px] font-bold tracking-[0.18em] uppercase mb-4" style={{ color: '#5e5870' }}>
           어떤 답이 필요하신가요?
         </p>
-        <div className="grid grid-cols-2 gap-2.5 mb-6">
+
+        {/* 2×2 service grid */}
+        <div className="grid grid-cols-2 gap-3 mb-5">
           {SERVICES.map((s) => {
             const active = selected === s.type;
             return (
-              <button key={s.type} type="button" onClick={() => setSelected(s.type)}
-                className="text-left p-4 rounded-2xl transition-all duration-200 active:scale-95"
+              <button
+                key={s.type}
+                type="button"
+                onClick={() => setSelected(s.type)}
+                className="text-left p-5 rounded-2xl transition-all duration-200 active:scale-95"
                 style={{
-                  background: active
-                    ? 'linear-gradient(145deg, rgba(139,107,181,0.25), rgba(8,4,18,0.7))'
-                    : 'rgba(255,255,255,0.04)',
-                  border: active ? '1px solid rgba(177,156,217,0.55)' : '1px solid rgba(255,255,255,0.07)',
-                  boxShadow: active ? '0 0 24px rgba(139,107,181,0.2)' : undefined,
+                  background: active ? s.accentBg : 'rgba(255,255,255,0.04)',
+                  border: `1px solid ${active ? s.accentBorder : 'rgba(255,255,255,0.08)'}`,
+                  boxShadow: active
+                    ? `0 0 28px ${s.accentBg}, 0 0 0 1px ${s.accentBorder}`
+                    : undefined,
+                  transform: active ? 'scale(1.02)' : undefined,
                 }}>
-                <span className="text-lg block mb-1.5">{s.icon}</span>
-                <p className={`text-xs font-bold mb-0.5 ${active ? 'text-lavender-light' : 'text-ivory'}`}>{s.label}</p>
-                <p className="text-[11px]" style={{ color: '#5e5870' }}>{s.sub}</p>
+                <span className="text-2xl block mb-3">{s.icon}</span>
+                <p className="text-sm font-bold mb-1.5 leading-tight"
+                  style={{ color: active ? s.accent : '#f0ebe0' }}>
+                  {s.label}
+                </p>
+                <p className="text-[11px] leading-snug whitespace-pre-line"
+                  style={{ color: active ? s.accent + 'cc' : '#5e5870' }}>
+                  {s.desc}
+                </p>
+                {active && (
+                  <div className="mt-3 flex items-center gap-1">
+                    <div className="w-1.5 h-1.5 rounded-full" style={{ background: s.accent }} />
+                    <span className="text-[10px] font-bold" style={{ color: s.accent }}>선택됨</span>
+                  </div>
+                )}
               </button>
             );
           })}
         </div>
 
         {/* Main CTA */}
-        <button type="button" onClick={handleStart} disabled={!selected}
-          className="w-full py-4 rounded-2xl font-bold text-sm transition-all active:scale-[0.98]"
+        <button
+          type="button"
+          onClick={handleStart}
+          disabled={!selected}
+          className="w-full py-4 rounded-2xl font-bold text-sm transition-all duration-200 active:scale-[0.98]"
           style={{
             background: selected
               ? 'linear-gradient(135deg, #6b3fa0 0%, #9b6dd0 100%)'
               : 'rgba(255,255,255,0.05)',
-            color: selected ? '#fff' : 'rgba(240,235,224,0.25)',
-            boxShadow: selected ? '0 4px 28px rgba(107,63,160,0.45)' : undefined,
+            color: selected ? '#fff' : 'rgba(240,235,224,0.2)',
+            boxShadow: selected ? '0 4px 32px rgba(107,63,160,0.5)' : undefined,
+            transform: selected ? 'scale(1.01)' : undefined,
           }}>
           3장의 카드로 지금 확인하기 →
         </button>
 
-        <p className="text-[11px] mt-3" style={{ color: '#5e5870' }}>
-          무료 카드 3장 → 정밀 리포트 4,900원
+        <p className="text-center text-[11px] mt-3" style={{ color: '#5e5870' }}>
+          무료 리딩 후, 원할 때만 정밀 리포트를 열어보세요.
         </p>
       </section>
 
@@ -248,7 +308,7 @@ export default function Home() {
             </div>
           ))}
           <div className="p-4" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-            <button type="button" onClick={() => router.push('/')}
+            <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className="w-full py-3.5 rounded-xl font-bold text-sm transition-all active:scale-95"
               style={{
                 background: 'linear-gradient(135deg, #c9956c 0%, #e0b48c 100%)',

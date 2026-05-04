@@ -5,6 +5,13 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { ServiceType, RelationshipStatus } from '@/types';
 import { createReading } from '@/lib/firestore';
 
+const SERVICE_LABELS: Record<string, string> = {
+  love_mind: '💜 상대 속마음',
+  contact_reunion: '📩 연락·재회 가능성',
+  money_business: '💰 금전·사업운',
+  choice_tarot: '⚖️ 선택 타로',
+};
+
 const STATUSES: RelationshipStatus[] = ['썸', '연애중', '헤어짐', '읽씹/잠수', '짝사랑'];
 
 const STATUS_LABELS: Record<RelationshipStatus, string> = {
@@ -88,7 +95,7 @@ function ReadingForm() {
         <div className="mb-8">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-4"
             style={{ background: 'rgba(139,107,181,0.15)', border: '1px solid rgba(139,107,181,0.3)', color: '#d4c5f0' }}>
-            {serviceType}
+            {SERVICE_LABELS[serviceType] ?? serviceType}
           </div>
           <h1 className="text-2xl font-extrabold text-ivory mb-1.5" style={{ letterSpacing: '-0.025em' }}>
             정확한 리딩을 위해<br />현재 상황을 알려주세요
